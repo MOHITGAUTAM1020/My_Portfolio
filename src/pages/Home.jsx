@@ -3,6 +3,15 @@ import { motion } from "framer-motion";
 
 const PROJECTS = [
   {
+    title: "FreshoFoods App",
+    type: "Mobile Application",
+    description:
+      "A seamless mobile experience allowing users to pre-order meals, skip canteen lines, and handle seamless smart payments.",
+    tech: ["React Native Cli", "Redux", "Socket.io", "Node.js"],
+    live: "https://play.google.com/store/apps/details?id=com.freshopurefoods",
+    code: null,
+  },
+  {
     title: "Freshopure POS",
     type: "Point of Sale System",
     description:
@@ -12,12 +21,12 @@ const PROJECTS = [
     code: null,
   },
   {
-    title: "FreshoFoods App",
-    type: "Mobile Application",
+    title: "Freshopure Foods",
+    type: "Buy Event Tickets or Order Food",
     description:
-      "A seamless mobile experience allowing users to pre-order meals, skip canteen lines, and handle seamless smart payments.",
-    tech: ["React Native Cli", "Redux", "Socket.io", "Node.js"],
-    live: "#",
+      "A Platform for buying event tickets and ordering food. Organizing and Managing the events and food orders.",
+    tech: ["React", "Redux", "Node.js", "MongoDB", "Tailwind CSS"],
+    live: "https://one.freshopure.com",
     code: null,
   },
   {
@@ -268,7 +277,7 @@ const Projects = () => {
                       rel="noreferrer"
                       className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-zinc-100 hover:text-zinc-500 dark:hover:text-zinc-500 transition-colors border-b border-zinc-900 dark:border-zinc-100 pb-1"
                     >
-                      Open Live Site ↗
+                      {project.type === "Mobile Application" ? "Open App Link ↗" : "Open Live Site ↗"}
                     </a>
                   )}
                 </div>
@@ -291,7 +300,7 @@ const Projects = () => {
                 </div>
 
                 <div className="flex-1 relative bg-white dark:bg-black overflow-hidden pointer-events-none group-hover:pointer-events-auto">
-                  {project.live !== "#" ? (
+                  {project.live !== "#" && project.type !== "Mobile Application" ? (
                     <iframe
                       src={project.live}
                       title={`${project.title} Preview`}
@@ -299,12 +308,8 @@ const Projects = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400 bg-zinc-100 dark:bg-zinc-900 font-mono text-sm uppercase tracking-widest">
-                      {/* <span>📱 Native App</span>
-                      <span className="text-xs mt-2 text-zinc-500">
-                        Preview via TestFlight / APK
-                      </span> */}
-                      <img src="../TAP_N_PAY.png" alt="" className="" />
+                    <div className="w-full h-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                      <img src="../TAP_N_PAY.png" alt="App Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
