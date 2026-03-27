@@ -12,21 +12,22 @@ const PROJECTS = [
     code: null,
   },
   {
+    title: "Freshopure Foods Web",
+    type: "Event Ticketing & Food Delivery Platform",
+    description:
+      "An integrated web platform designed to streamline event ticket bookings and food ordering, offering users a unified experience while providing organizers with robust management tools.",
+    tech: ["React", "Redux", "Node.js", "MongoDB", "Tailwind CSS"],
+    live: "https://one.freshopure.com",
+    images: ["/web_1.png","/web_2.png","/web_3.png","/web_4.png"],
+    code: null,
+  },
+  {
     title: "Freshopure POS",
     type: "Point of Sale System",
     description:
       "A robust, cloud-based Point of Sale interface engineered for fast transaction processing and real-time inventory management.",
     tech: ["React", "Redux", "Node.js", "MongoDB", "Tailwind CSS"],
     live: "https://pos.freshopure.com/login",
-    code: null,
-  },
-  {
-    title: "Freshopure Foods",
-    type: "Buy Event Tickets or Order Food",
-    description:
-      "A Platform for buying event tickets and ordering food. Organizing and Managing the events and food orders.",
-    tech: ["React", "Redux", "Node.js", "MongoDB", "Tailwind CSS"],
-    live: "https://one.freshopure.com",
     code: null,
   },
   {
@@ -45,6 +46,7 @@ const PROJECTS = [
       "An advanced, AI-driven procurement platform designed specifically for the HoReCa sector to streamline supply chains.",
     tech: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"],
     live: "https://ai.freshopure.com/",
+    images: ["/ai_1.png", "/ai_2.png", "/ai_3.png", "/ai_4.png"],
     code: null,
   },
 ];
@@ -212,6 +214,52 @@ const About = () => (
   </section>
 );
 
+const ImageSlider = ({ images }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!images || images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [images]);
+
+  if (!images || images.length === 0) return null;
+
+  return (
+    <div className="w-full h-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900 pointer-events-auto">
+      {images.map((img, idx) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`Slide ${idx}`}
+          className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-1000 ${
+            idx === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+          }`}
+        />
+      ))}
+      
+      {images.length > 1 && (
+        <div className="absolute bottom-4 left-0 right-0 gap-2 flex justify-center z-20">
+          {images.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentIndex(idx);
+              }}
+              className={`h-2 rounded-full transition-all ${
+                idx === currentIndex ? "bg-zinc-900 dark:bg-white w-6" : "bg-zinc-900/40 dark:bg-white/40 w-2 hover:bg-zinc-900/60 dark:hover:bg-white/60"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Projects = () => {
   // 1. Add state to track if we are showing all projects
   const [showAll, setShowAll] = useState(false);
@@ -300,7 +348,9 @@ const Projects = () => {
                 </div>
 
                 <div className="flex-1 relative bg-white dark:bg-black overflow-hidden pointer-events-none group-hover:pointer-events-auto">
-                  {project.live !== "#" && project.type !== "Mobile Application" ? (
+                  {project.images && project.images.length > 0 ? (
+                    <ImageSlider images={project.images} />
+                  ) : project.live !== "#" && project.type !== "Mobile Application" ? (
                     <iframe
                       src={project.live}
                       title={`${project.title} Preview`}
@@ -308,7 +358,7 @@ const Projects = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                    <div className="w-full h-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900 pointer-events-auto">
                       <img src="../TAP_N_PAY.png" alt="App Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
