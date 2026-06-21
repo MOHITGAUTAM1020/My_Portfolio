@@ -3,6 +3,21 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px; /* Prevents the fixed navbar from covering section titles */
+  cursor: none; /* Hide default cursor */
+}
+
+/* Hide cursor on all elements by default so the custom one is visible */
+*, *::before, *::after {
+  cursor: none !important;
+}
+
+/* Hide scrollbars */
+::-webkit-scrollbar {
+  display: none;
+}
+html {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* 1. Define our Custom Fonts */

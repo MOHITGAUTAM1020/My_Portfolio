@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Sphere, MeshDistortMaterial, Float, Environment } from "@react-three/drei";
 import { FiSun, FiMoon, FiCode, FiSmartphone, FiDatabase } from "react-icons/fi";
 
 const PROJECTS = [
@@ -70,17 +72,127 @@ const SKILLS = [
 ];
 
 // ==========================================
+// CUSTOM CURSOR
+// ==========================================
+const CustomCursor = () => {
+  const [isHovering, setIsHovering] = useState(false);
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  useEffect(() => {
+    const moveCursor = (e) => {
+      cursorX.set(e.clientX - 16); // offset by half width (32px / 2)
+      cursorY.set(e.clientY - 16);
+    };
+
+    const handleMouseOver = (e) => {
+      if (
+        e.target.tagName.toLowerCase() === "a" ||
+        e.target.tagName.toLowerCase() === "button" ||
+        e.target.closest("a") ||
+        e.target.closest("button")
+      ) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
+
+    window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("mouseover", handleMouseOver);
+
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      window.removeEventListener("mouseover", handleMouseOver);
+    };
+  }, [cursorX, cursorY]);
+
+  return (
+    <motion.div
+      style={{
+        x: cursorXSpring,
+        y: cursorYSpring,
+      }}
+      animate={{
+        scale: isHovering ? 2.5 : 1,
+      }}
+      className={`fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] mix-blend-difference flex items-center justify-center ${
+        isHovering ? "bg-white border-0" : "border-2 border-white bg-white/20"
+      }`}
+    >
+      <div className={`w-1 h-1 rounded-full bg-white transition-opacity duration-300 ${isHovering ? "opacity-0" : "opacity-100"}`} />
+    </motion.div>
+  );
+};
+
+// ==========================================
+// 3D HERO SCENE
+// ==========================================
+const Scene3D = ({ dark }) => {
+  return (
+    <div className="absolute top-0 right-0 w-full md:w-1/2 h-full opacity-60 md:opacity-100 z-0 pointer-events-none">
+      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+        <ambientLight intensity={dark ? 0.5 : 1.5} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} />
+        <Environment preset={dark ? "night" : "city"} />
+        <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
+          <Sphere args={[1.5, 64, 64]}>
+            <MeshDistortMaterial
+              color={dark ? "#4f46e5" : "#6366f1"}
+              attach="material"
+              distort={0.5}
+              speed={2}
+              roughness={0.2}
+              metalness={0.8}
+            />
+          </Sphere>
+        </Float>
+      </Canvas>
+    </div>
+  );
+};
+
+// ==========================================
 // COMPONENTS
 // ==========================================
+
+const TypewriterText = ({ text }) => {
+  const [displayed, setDisplayed] = useState("");
+  
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayed(text.substring(0, i));
+      i++;
+      if (i > text.length) clearInterval(interval);
+    }, 150);
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return (
+    <span className="flex items-center">
+      {displayed}
+      <motion.span
+        animate={{ opacity: [1, 0] }}
+        transition={{ repeat: Infinity, duration: 0.8 }}
+        className="inline-block w-[0.15em] h-[0.85em] bg-zinc-900 dark:bg-zinc-100 ml-1 align-middle"
+      />
+    </span>
+  );
+};
 
 const Navbar = ({ dark, toggleTheme }) => (
   <nav className="fixed top-0 w-full z-50 bg-[#FAFAFA]/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/80 transition-colors duration-500">
     <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
       <a
         href="#home"
-        className="text-xl font-black tracking-tighter uppercase text-zinc-900 dark:text-zinc-100"
+        className="text-xl font-black tracking-tighter uppercase text-zinc-900 dark:text-zinc-100 w-[200px]"
       >
-        MOHIT GAUTAM
+        <TypewriterText text="MOHIT GAUTAM" />
       </a>
       <div className="hidden md:flex items-center space-x-10 text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
         <a
@@ -115,16 +227,18 @@ const Navbar = ({ dark, toggleTheme }) => (
   </nav>
 );
 
-const Hero = () => (
+const Hero = ({ dark }) => (
   <section
     id="home"
-    className="min-h-screen flex flex-col justify-center px-6 pt-20"
+    className="min-h-screen flex flex-col justify-center px-6 pt-20 relative overflow-hidden"
   >
-    <div className="max-w-7xl mx-auto w-full">
+    <Scene3D dark={dark} />
+    <div className="max-w-7xl mx-auto w-full relative z-10 pointer-events-none">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="pointer-events-auto"
       >
         <p className="text-xs font-bold tracking-[0.2em] uppercase text-zinc-500 dark:text-zinc-400 mb-8 border-l-2 border-zinc-900 dark:border-zinc-100 pl-4">
           Software Engineer — Based in Jaipur
@@ -160,9 +274,15 @@ const Hero = () => (
 const About = () => (
   <section
     id="about"
-    className="py-40 px-6 border-t border-zinc-200 dark:border-zinc-800/80"
+    className="py-40 px-6 border-t border-zinc-200 dark:border-zinc-800/80 overflow-hidden"
   >
-    <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-16">
+    <motion.div 
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8 }}
+      className="max-w-7xl mx-auto grid md:grid-cols-12 gap-16"
+    >
       <div className="md:col-span-4">
         <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-100">
           The Details
@@ -218,13 +338,19 @@ const About = () => (
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   </section>
 );
 
 const Services = () => (
-  <section className="py-24 px-6 bg-zinc-900 dark:bg-zinc-50 border-t border-zinc-800 dark:border-zinc-200">
-    <div className="max-w-7xl mx-auto">
+  <section className="py-24 px-6 bg-zinc-900 dark:bg-zinc-50 border-t border-zinc-800 dark:border-zinc-200 overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8 }}
+      className="max-w-7xl mx-auto"
+    >
       <div className="mb-16">
         <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-zinc-50 dark:text-zinc-900">
           Services
@@ -252,14 +378,19 @@ const Services = () => (
             desc: "Building complex real-time ecosystems using Socket.io, OAuth, RBAC, and integrating powerful AI models like GPT-4o.",
           },
         ].map((s, i) => (
-          <div key={i} className="bg-zinc-800 dark:bg-white p-8 border border-zinc-700 dark:border-zinc-200 hover:-translate-y-2 transition-transform duration-300 shadow-xl">
+          <motion.div 
+            whileHover={{ y: -10, rotateX: 5, rotateY: 5 }}
+            key={i} 
+            className="bg-zinc-800 dark:bg-white p-8 border border-zinc-700 dark:border-zinc-200 shadow-xl"
+            style={{ perspective: 1000 }}
+          >
             {s.icon}
             <h3 className="text-xl font-bold uppercase tracking-wide text-zinc-100 dark:text-zinc-900 mb-4">{s.title}</h3>
             <p className="text-zinc-400 dark:text-zinc-600 leading-relaxed text-sm">{s.desc}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   </section>
 );
 
@@ -343,7 +474,13 @@ const Projects = () => {
               className="group grid md:grid-cols-12 gap-12 items-center border-t border-zinc-300 dark:border-zinc-800 py-16"
             >
               {/* Left Side: Text Content */}
-              <div className="md:col-span-5 flex flex-col justify-between h-full pr-8">
+              <motion.div 
+                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 50 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="md:col-span-5 flex flex-col justify-between h-full pr-8"
+              >
                 <div>
                   <span className="text-xs font-bold tracking-[0.2em] uppercase text-zinc-500 mb-6 block">
                     0{idx + 1} // {project.type}
@@ -388,10 +525,15 @@ const Projects = () => {
                     </a>
                   )}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Right Side: Live Iframe Preview */}
-              <div className={`md:col-span-7 relative flex justify-center items-center ${project.type === "Mobile Application" ? "py-8" : ""}`}>
+              <motion.div 
+                whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                style={{ perspective: 1000 }}
+                className={`md:col-span-7 relative flex justify-center items-center ${project.type === "Mobile Application" ? "py-8" : ""}`}
+              >
                 {project.type === "Mobile Application" ? (
                   /* Mobile Phone Frame (iOS Style) */
                   <div className="relative w-[280px] h-[580px] bg-black rounded-[3rem] border-[8px] border-zinc-800 shadow-2xl overflow-hidden flex flex-col group-hover:border-zinc-600 transition-colors duration-500">
@@ -438,7 +580,7 @@ const Projects = () => {
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             </motion.div>
           ))}
         </div>
@@ -625,9 +767,10 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0A] transition-colors duration-500 font-sans text-zinc-900 dark:text-zinc-100 selection:bg-zinc-900 selection:text-[#FAFAFA] dark:selection:bg-zinc-100 dark:selection:text-[#0A0A0A]">
+      <CustomCursor />
       <Navbar dark={dark} toggleTheme={() => setDark(!dark)} />
       <main>
-        <Hero />
+        <Hero dark={dark} />
         <About />
         <Services />
         <Projects />
