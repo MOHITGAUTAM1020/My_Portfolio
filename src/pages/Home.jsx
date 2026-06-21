@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Sphere, MeshDistortMaterial, Float, Environment } from "@react-three/drei";
-import { FiSun, FiMoon, FiCode, FiSmartphone, FiDatabase } from "react-icons/fi";
+import { FiSun, FiMoon, FiCode, FiSmartphone, FiDatabase, FiMenu, FiX } from "react-icons/fi";
 
 const PROJECTS = [
   {
@@ -120,7 +120,7 @@ const CustomCursor = () => {
       animate={{
         scale: isHovering ? 2.5 : 1,
       }}
-      className={`fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] mix-blend-difference flex items-center justify-center ${
+      className={`hidden md:flex fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] mix-blend-difference items-center justify-center ${
         isHovering ? "bg-white border-0" : "border-2 border-white bg-white/20"
       }`}
     >
@@ -134,7 +134,7 @@ const CustomCursor = () => {
 // ==========================================
 const Scene3D = ({ dark }) => {
   return (
-    <div className="absolute top-0 right-0 w-full md:w-1/2 h-full opacity-60 md:opacity-100 z-0 pointer-events-none">
+    <div className="absolute top-1/4 md:top-0 right-0 w-full md:w-1/2 h-[75%] md:h-full opacity-30 md:opacity-100 z-0 pointer-events-none">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
         <ambientLight intensity={dark ? 0.5 : 1.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
@@ -185,47 +185,76 @@ const TypewriterText = ({ text }) => {
   );
 };
 
-const Navbar = ({ dark, toggleTheme }) => (
-  <nav className="fixed top-0 w-full z-50 bg-[#FAFAFA]/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/80 transition-colors duration-500">
-    <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-      <a
-        href="#home"
-        className="text-xl font-black tracking-tighter uppercase text-zinc-900 dark:text-zinc-100 w-[200px]"
-      >
-        <TypewriterText text="MOHIT GAUTAM" />
-      </a>
-      <div className="hidden md:flex items-center space-x-10 text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+const Navbar = ({ dark, toggleTheme }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <nav className="fixed top-0 w-full z-50 bg-[#FAFAFA]/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/80 transition-colors duration-500">
+      <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
         <a
-          href="#about"
-          className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          href="#home"
+          className="text-xl font-black tracking-tighter uppercase text-zinc-900 dark:text-zinc-100 w-[200px]"
         >
-          About
+          <TypewriterText text="MOHIT GAUTAM" />
         </a>
-        <a
-          href="#projects"
-          className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        >
-          Work
-        </a>
-        <a
-          href="#contact"
-          className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        >
-          Contact
-        </a>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center space-x-10 text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+          <a href="#about" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            About
+          </a>
+          <a href="#projects" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Work
+          </a>
+          <a href="#contact" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Contact
+          </a>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+            aria-label="Toggle Theme"
+          >
+            {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
+          </button>
+          
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden p-2 text-zinc-900 dark:text-zinc-100"
+            aria-label="Toggle Menu"
+          >
+            {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          </button>
+        </div>
       </div>
-      <div className="flex items-center gap-4">
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
-          aria-label="Toggle Theme"
-        >
-          {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
-        </button>
-      </div>
-    </div>
-  </nav>
-);
+
+      {/* Mobile Nav Overlay */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-full left-0 w-full bg-[#FAFAFA] dark:bg-[#0A0A0A] border-b border-zinc-200 dark:border-zinc-800 flex flex-col items-center py-10 space-y-8 md:hidden shadow-2xl"
+          >
+            <a onClick={() => setMenuOpen(false)} href="#about" className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
+              About
+            </a>
+            <a onClick={() => setMenuOpen(false)} href="#projects" className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
+              Work
+            </a>
+            <a onClick={() => setMenuOpen(false)} href="#contact" className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
+              Contact
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+};
 
 const Hero = ({ dark }) => (
   <section
@@ -243,9 +272,9 @@ const Hero = ({ dark }) => (
         <p className="text-xs font-bold tracking-[0.2em] uppercase text-zinc-500 dark:text-zinc-400 mb-8 border-l-2 border-zinc-900 dark:border-zinc-100 pl-4">
           Software Engineer — Based in Jaipur
         </p>
-        <h1 className="text-6xl md:text-8xl lg:text-[11rem] font-black uppercase tracking-tighter leading-[0.85] text-zinc-900 dark:text-zinc-100 mb-10">
+        <h1 className="text-6xl md:text-8xl lg:text-[11rem] font-black uppercase tracking-tighter leading-[0.85] text-zinc-900 dark:text-zinc-100 mb-10 relative z-10">
           I build <br className="hidden md:block" />
-          <span className="text-zinc-400 dark:text-zinc-600">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">
             scalable
           </span>{" "}
           <br className="hidden md:block" />
@@ -283,12 +312,12 @@ const About = () => (
       transition={{ duration: 0.8 }}
       className="max-w-7xl mx-auto grid md:grid-cols-12 gap-16"
     >
-      <div className="md:col-span-4">
-        <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-100">
+      <div className="md:col-span-4 min-w-0">
+        <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-100 break-words">
           The Details
         </h2>
       </div>
-      <div className="md:col-span-8 space-y-16">
+      <div className="md:col-span-8 space-y-16 min-w-0 w-full overflow-hidden">
         <div className="text-2xl md:text-4xl font-light leading-snug text-zinc-700 dark:text-zinc-300">
           <p className="mb-8">
             I am a Full Stack Developer building production-grade MERN web applications and cross-platform mobile apps for the HoReCa SaaS industry.
@@ -539,7 +568,7 @@ const Projects = () => {
                   <div className="relative w-[280px] h-[580px] bg-black rounded-[3rem] border-[8px] border-zinc-800 shadow-2xl overflow-hidden flex flex-col group-hover:border-zinc-600 transition-colors duration-500">
                     {/* iOS Notch */}
                     <div className="absolute top-0 inset-x-0 h-6 bg-black rounded-b-3xl w-1/2 mx-auto z-20"></div>
-                    <div className="flex-1 relative bg-zinc-900 overflow-hidden pointer-events-none group-hover:pointer-events-auto">
+                    <div className="flex-1 relative bg-zinc-900 overflow-hidden pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto">
                       {project.images && project.images.length > 0 ? (
                         <ImageSlider images={project.images} objectFit="object-cover" />
                       ) : (
@@ -564,7 +593,7 @@ const Projects = () => {
                       <div className="w-10"></div>
                     </div>
 
-                    <div className="flex-1 relative bg-white dark:bg-black overflow-hidden pointer-events-none group-hover:pointer-events-auto">
+                    <div className="flex-1 relative bg-white dark:bg-black overflow-hidden pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto">
                       {project.images && project.images.length > 0 ? (
                         <ImageSlider images={project.images} />
                       ) : project.live !== "#" ? (
