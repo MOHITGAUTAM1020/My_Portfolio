@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { FiSun, FiMoon, FiCode, FiSmartphone, FiDatabase } from "react-icons/fi";
 
 const PROJECTS = [
   {
     title: "FreshoFoods App",
     type: "Mobile Application",
     description:
-      "A seamless mobile experience allowing users to pre-order meals, skip canteen lines, and handle seamless smart payments.",
-    tech: ["React Native Cli", "Redux", "Socket.io", "Node.js"],
+      "A seamless cross-platform mobile experience allowing users to pre-order meals, skip canteen lines, and handle smart NFC tap-to-pay transactions.",
+    tech: ["React Native CLI", "Redux", "Socket.io", "Node.js", "NFC"],
     live: "https://play.google.com/store/apps/details?id=com.freshopurefoods",
+    appStore: "https://apps.apple.com/in/app/freshopure-foods/id6772279000",
+    images: ["/app_1.jpeg", "/app_2.jpeg", "/app_3.jpeg", "/app_4.jpeg"],
     code: null,
   },
   {
@@ -52,15 +55,18 @@ const PROJECTS = [
 ];
 
 const SKILLS = [
-  "React",
-  "React Native",
-  "jQuery",
-  "Tailwind CSS",
-  "Socket.io",
+  "React.js",
+  "React Native CLI",
   "Node.js",
-  "Express",
+  "Express.js",
   "MongoDB",
-  "MySQL",
+  "Socket.io",
+  "Azure Cognitive Services",
+  "GPT-4o",
+  "AWS Amplify",
+  "Zoho Catalyst",
+  "Tailwind CSS",
+  "Redux",
 ];
 
 // ==========================================
@@ -99,9 +105,10 @@ const Navbar = ({ dark, toggleTheme }) => (
       <div className="flex items-center gap-4">
         <button
           onClick={toggleTheme}
-          className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100 hover:opacity-60 transition-opacity"
+          className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+          aria-label="Toggle Theme"
         >
-          {dark ? "Light Mode" : "Dark Mode"}
+          {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
         </button>
       </div>
     </div>
@@ -164,45 +171,46 @@ const About = () => (
       <div className="md:col-span-8 space-y-16">
         <div className="text-2xl md:text-4xl font-light leading-snug text-zinc-700 dark:text-zinc-300">
           <p className="mb-8">
-            I am a Full Stack Developer specializing in React, Node.js, and
-            modern infrastructure. I don't just write code; I engineer solutions
-            that solve actual business problems.
+            I am a Full Stack Developer building production-grade MERN web applications and cross-platform mobile apps for the HoReCa SaaS industry.
           </p>
           <p>
-            With a focus on clean architecture, performance, and
-            maintainability, I turn complex requirements into elegant, robust
-            web applications.
+            I specialize in real-time systems with <strong className="font-bold text-zinc-900 dark:text-zinc-100">Socket.io</strong>, integrating <strong className="font-bold text-zinc-900 dark:text-zinc-100">Azure AI & GPT-4o</strong>, and engineering hardware-to-software bridges like <strong className="font-bold text-zinc-900 dark:text-zinc-100">NFC contactless payments</strong>.
           </p>
         </div>
 
-        <div>
+        <div className="overflow-hidden w-full max-w-full">
           <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-zinc-800/80 pb-6 mb-8">
             Core Technologies
           </h3>
-          <div className="flex flex-wrap gap-3">
-            {SKILLS.map((skill) => (
-              <span
-                key={skill}
-                className="px-5 py-3 border border-zinc-300 dark:border-zinc-800 text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-widest hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
-              >
-                {skill}
-              </span>
-            ))}
+          <div className="relative flex overflow-hidden w-full bg-zinc-100 dark:bg-zinc-900/50 py-4 border-y border-zinc-200 dark:border-zinc-800/80">
+            {/* Mask to create fade effect on edges */}
+            <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-[#FAFAFA] via-transparent to-[#FAFAFA] dark:from-[#0A0A0A] dark:to-[#0A0A0A]" />
+            <div className="flex animate-marquee whitespace-nowrap min-w-max pl-4">
+              {/* Double array to create seamless loop */}
+              {[...SKILLS, ...SKILLS, ...SKILLS].map((skill, idx) => (
+                <span
+                  key={`${skill}-${idx}`}
+                  className="mx-3 px-5 py-3 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-widest hover:border-zinc-500 transition-colors cursor-default"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-zinc-200 dark:border-zinc-800/80">
           <div>
             <div className="text-5xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter">
-              5+
+              3+
             </div>
             <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-3">
-              Projects Shipped
+              Production Apps Live
             </div>
           </div>
           <div>
             <div className="text-5xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter">
-              1+
+              1.5+
             </div>
             <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-3">
               Years Exp.
@@ -214,7 +222,48 @@ const About = () => (
   </section>
 );
 
-const ImageSlider = ({ images }) => {
+const Services = () => (
+  <section className="py-24 px-6 bg-zinc-900 dark:bg-zinc-50 border-t border-zinc-800 dark:border-zinc-200">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-16">
+        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-zinc-50 dark:text-zinc-900">
+          Services
+        </h2>
+        <p className="text-zinc-400 dark:text-zinc-600 mt-4 max-w-lg">
+          I partner with startups and enterprises to build high-performance products from scratch.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        {[
+          {
+            icon: <FiCode size={32} className="mb-6 text-zinc-400 dark:text-zinc-500" />,
+            title: "MVP Development",
+            desc: "Rapid delivery of MERN stack applications. I take ideas from concept to a production-ready Web App optimized for user growth.",
+          },
+          {
+            icon: <FiSmartphone size={32} className="mb-6 text-zinc-400 dark:text-zinc-500" />,
+            title: "Cross-Platform Mobile",
+            desc: "React Native applications for iOS and Android. Seamless experiences with native hardware integration like NFC and Camera.",
+          },
+          {
+            icon: <FiDatabase size={32} className="mb-6 text-zinc-400 dark:text-zinc-500" />,
+            title: "SaaS Architecture & AI",
+            desc: "Building complex real-time ecosystems using Socket.io, OAuth, RBAC, and integrating powerful AI models like GPT-4o.",
+          },
+        ].map((s, i) => (
+          <div key={i} className="bg-zinc-800 dark:bg-white p-8 border border-zinc-700 dark:border-zinc-200 hover:-translate-y-2 transition-transform duration-300 shadow-xl">
+            {s.icon}
+            <h3 className="text-xl font-bold uppercase tracking-wide text-zinc-100 dark:text-zinc-900 mb-4">{s.title}</h3>
+            <p className="text-zinc-400 dark:text-zinc-600 leading-relaxed text-sm">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+const ImageSlider = ({ images, objectFit = "object-contain" }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -234,7 +283,7 @@ const ImageSlider = ({ images }) => {
           key={idx}
           src={img}
           alt={`Slide ${idx}`}
-          className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-1000 ${
+          className={`absolute top-0 left-0 w-full h-full ${objectFit} transition-opacity duration-1000 ${
             idx === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         />
@@ -264,8 +313,8 @@ const Projects = () => {
   // 1. Add state to track if we are showing all projects
   const [showAll, setShowAll] = useState(false);
 
-  // 2. Slice the array to show either 2 projects, or all of them
-  const visibleProjects = showAll ? PROJECTS : PROJECTS.slice(0, 2);
+  // 2. Slice the array to show either 3 projects, or all of them
+  const visibleProjects = showAll ? PROJECTS : PROJECTS.slice(0, 3);
 
   return (
     <section
@@ -317,59 +366,85 @@ const Projects = () => {
                   ))}
                 </div>
 
-                <div className="mt-8 flex gap-6">
-                  {project.live !== "#" && (
+                <div className="mt-8 flex flex-wrap gap-6">
+                  {project.live && project.live !== "#" && (
                     <a
                       href={project.live}
                       target="_blank"
                       rel="noreferrer"
                       className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-zinc-100 hover:text-zinc-500 dark:hover:text-zinc-500 transition-colors border-b border-zinc-900 dark:border-zinc-100 pb-1"
                     >
-                      {project.type === "Mobile Application" ? "Open App Link ↗" : "Open Live Site ↗"}
+                      {project.type === "Mobile Application" ? "Google Play ↗" : "Live Site ↗"}
+                    </a>
+                  )}
+                  {project.appStore && project.appStore !== "#" && (
+                    <a
+                      href={project.appStore}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-zinc-100 hover:text-zinc-500 dark:hover:text-zinc-500 transition-colors border-b border-zinc-900 dark:border-zinc-100 pb-1"
+                    >
+                      App Store ↗
                     </a>
                   )}
                 </div>
               </div>
 
               {/* Right Side: Live Iframe Preview */}
-              <div className="md:col-span-7 relative bg-zinc-200 dark:bg-zinc-900 aspect-4/3 md:aspect-16/10 rounded-lg overflow-hidden flex flex-col border border-zinc-300 dark:border-zinc-800 shadow-2xl group-hover:border-zinc-400 dark:group-hover:border-zinc-600 transition-colors duration-500">
-                <div className="h-8 bg-zinc-300 dark:bg-zinc-950 flex items-center px-4 gap-2 border-b border-zinc-300 dark:border-zinc-800">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400/80"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400/80"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400/80"></div>
-                  </div>
-                  <div className="mx-auto bg-zinc-200 dark:bg-zinc-900 px-3 py-0.5 rounded text-[10px] text-zinc-500 dark:text-zinc-400 font-mono truncate max-w-50">
-                    {project.live !== "#"
-                      ? project.live.replace("https://", "")
-                      : "Freshopure Foods App"}
-                  </div>
-                  <div className="w-10"></div>
-                </div>
-
-                <div className="flex-1 relative bg-white dark:bg-black overflow-hidden pointer-events-none group-hover:pointer-events-auto">
-                  {project.images && project.images.length > 0 ? (
-                    <ImageSlider images={project.images} />
-                  ) : project.live !== "#" && project.type !== "Mobile Application" ? (
-                    <iframe
-                      src={project.live}
-                      title={`${project.title} Preview`}
-                      className="w-full h-full border-none"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-900 pointer-events-auto">
-                      <img src="../TAP_N_PAY.png" alt="App Preview" className="w-full h-full object-cover" />
+              <div className={`md:col-span-7 relative flex justify-center items-center ${project.type === "Mobile Application" ? "py-8" : ""}`}>
+                {project.type === "Mobile Application" ? (
+                  /* Mobile Phone Frame (iOS Style) */
+                  <div className="relative w-[280px] h-[580px] bg-black rounded-[3rem] border-[8px] border-zinc-800 shadow-2xl overflow-hidden flex flex-col group-hover:border-zinc-600 transition-colors duration-500">
+                    {/* iOS Notch */}
+                    <div className="absolute top-0 inset-x-0 h-6 bg-black rounded-b-3xl w-1/2 mx-auto z-20"></div>
+                    <div className="flex-1 relative bg-zinc-900 overflow-hidden pointer-events-none group-hover:pointer-events-auto">
+                      {project.images && project.images.length > 0 ? (
+                        <ImageSlider images={project.images} objectFit="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-500 text-sm">
+                          App Preview
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  /* Desktop Browser Frame */
+                  <div className="w-full relative bg-zinc-200 dark:bg-zinc-900 aspect-4/3 md:aspect-16/10 rounded-lg overflow-hidden flex flex-col border border-zinc-300 dark:border-zinc-800 shadow-2xl group-hover:border-zinc-400 dark:group-hover:border-zinc-600 transition-colors duration-500">
+                    <div className="h-8 bg-zinc-300 dark:bg-zinc-950 flex items-center px-4 gap-2 border-b border-zinc-300 dark:border-zinc-800">
+                      <div className="flex gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-400/80"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400/80"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-400/80"></div>
+                      </div>
+                      <div className="mx-auto bg-zinc-200 dark:bg-zinc-900 px-3 py-0.5 rounded text-[10px] text-zinc-500 dark:text-zinc-400 font-mono truncate max-w-50">
+                        {project.live !== "#" ? project.live.replace("https://", "") : "Project Preview"}
+                      </div>
+                      <div className="w-10"></div>
+                    </div>
+
+                    <div className="flex-1 relative bg-white dark:bg-black overflow-hidden pointer-events-none group-hover:pointer-events-auto">
+                      {project.images && project.images.length > 0 ? (
+                        <ImageSlider images={project.images} />
+                      ) : project.live !== "#" ? (
+                        <iframe
+                          src={project.live}
+                          title={`${project.title} Preview`}
+                          className="w-full h-full border-none"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900"></div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
         </div>
 
         {/* 4. Update Button to Toggle State */}
-        {PROJECTS.length > 2 && (
+        {PROJECTS.length > 3 && (
           <div className="mt-24 flex justify-center border-t border-zinc-300 dark:border-zinc-800 pt-16">
             <button
               onClick={() => setShowAll(!showAll)}
@@ -554,6 +629,7 @@ export default function Portfolio() {
       <main>
         <Hero />
         <About />
+        <Services />
         <Projects />
         <Contact />
       </main>
